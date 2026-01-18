@@ -1,0 +1,36 @@
+# docker-compose.yml
+# Optional Docker Compose setup for ReliCopilot-AI
+# Note: Ollama needs to be installed on the host system
+
+version: '3.8'
+
+services:
+  api:
+    build: .
+    command: python api.py
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./telemetry.db:/app/telemetry.db
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    networks:
+      - relicopilot
+
+  dashboard:
+    build: .
+    command: streamlit run dashboard.py
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    environment:
+      - API_BASE_URL=http://api:8000
+    networks:
+      - relicopilot
+
+networks:
+  relicopilot:
+    driver: bridge
