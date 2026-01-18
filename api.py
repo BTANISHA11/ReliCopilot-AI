@@ -52,7 +52,7 @@ async def telemetry_middleware(request: Request, call_next):
                 endpoint=str(request.url.path),
                 status_code=response.status_code,
                 latency_ms=latency_ms,
-                metadata=json.dumps({"method": request.method})
+                extra_data=json.dumps({"method": request.method})
             )
             session.add(event)
             await session.commit()
@@ -70,7 +70,7 @@ async def telemetry_middleware(request: Request, call_next):
                 status_code=500,
                 latency_ms=latency_ms,
                 error_message=str(e),
-                metadata=json.dumps({"method": request.method})
+                extra_data=json.dumps({"method": request.method})
             )
             session.add(event)
             await session.commit()
@@ -119,7 +119,7 @@ async def simulate_request(db: AsyncSession = Depends(get_db)):
             status_code=status_code,
             latency_ms=latency_ms,
             error_message=error_message,
-            metadata=json.dumps({"simulated": True})
+            extra_data=json.dumps({"simulated": True})
         )
         db.add(event)
         await db.commit()
@@ -182,7 +182,7 @@ async def get_telemetry(
                 "latency_ms": e.latency_ms,
                 "error_message": e.error_message,
                 "analysis": e.analysis,
-                "metadata": json.loads(e.metadata) if e.metadata else None
+                "extra_data": json.loads(e.extra_data) if e.extra_data else None
             }
             for e in events
         ]
@@ -245,7 +245,7 @@ async def analyze_event(event_id: int, db: AsyncSession = Depends(get_db)):
         error_message=event.error_message,
         endpoint=event.endpoint or "unknown",
         status_code=event.status_code or 500,
-        context=event.metadata
+        context=event.extra_data
     )
     
     # Update event

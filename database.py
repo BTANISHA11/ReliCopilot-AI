@@ -22,7 +22,7 @@ class TelemetryEvent(Base):
     latency_ms = Column(Float, nullable=True)
     error_message = Column(Text, nullable=True)
     analysis = Column(Text, nullable=True)  # AI analysis of the event
-    metadata = Column(Text, nullable=True)  # JSON string for additional data
+    extra_data = Column(Text, nullable=True)  # JSON string for additional data
     
     def __repr__(self):
         return f"<TelemetryEvent(id={self.id}, type={self.event_type}, timestamp={self.timestamp})>"
